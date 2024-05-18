@@ -5,7 +5,6 @@ import androidx.compose.ui.graphics.Color
 sealed class DjurState {
 
     data object Win: DjurState()
-    data object Loss: DjurState()
     data object Loading: DjurState()
     data object Ongoing: DjurState() {
         val djurColumn1: MutableList<Djur> = mutableListOf(
@@ -32,5 +31,7 @@ sealed class DjurState {
             Djur.Hare(Color.Red),
             Djur.Mose(Color.Yellow)
         ).shuffled().toMutableList()
+        var lastRemoved: Djur = Djur.Empty
+        var noMovesPossible = false
     }
 }
