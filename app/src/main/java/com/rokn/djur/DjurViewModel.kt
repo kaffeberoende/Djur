@@ -26,7 +26,11 @@ class DjurViewModel: ViewModel() {
                         3 -> handleRemoval(state.djurColumn3, id)
                         4 -> handleRemoval(state.djurColumn4, id)
                     }
-                    _uiState.emit(state)
+                    if (checkForWin()) {
+                        _uiState.emit(DjurState.Win)
+                    } else {
+                        _uiState.emit(state)
+                    }
                 }
             }
             else -> Unit
@@ -40,5 +44,17 @@ class DjurViewModel: ViewModel() {
                 column[i] = column[i - 1]
             column[0] = Djur.Empty
         }
+    }
+
+    private fun allowedToRemove(column: MutableList<Djur>, id: String): Boolean {
+        //TODO Find the real rules
+        return true
+    }
+
+    private fun checkForWin(): Boolean {
+        return state.djurColumn1.all { it is Djur.Empty } &&
+                state.djurColumn2.all { it is Djur.Empty } &&
+                state.djurColumn3.all { it is Djur.Empty } &&
+                state.djurColumn4.all { it is Djur.Empty }
     }
 }
