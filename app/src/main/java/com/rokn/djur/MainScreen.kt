@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -26,7 +27,9 @@ import kotlinx.coroutines.flow.asStateFlow
 @Composable
 fun MainScreen(
     state: State<DjurState>,
-    clicked: (Int, String) -> Unit
+    clicked: (DjurState.Ongoing, Int, String) -> Unit,
+    shuffleClicked: () -> Unit,
+    restartClicked: () -> Unit,
 ) {
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -39,22 +42,21 @@ fun MainScreen(
         ) { uiState ->
             when (uiState) {
                 is DjurState.Ongoing -> {
-                    Log.d("ROKN", "Ongoing")
                     Column {
                         Row(
                             verticalAlignment = Alignment.Bottom
                         ) {
                             DjurColumn(items = uiState.djurColumn1) {
-                                clicked(1, it)
+                                clicked(uiState,1, it)
                             }
                             DjurColumn(items = uiState.djurColumn2) {
-                                clicked(2, it)
+                                clicked(uiState, 2, it)
                             }
                             DjurColumn(items = uiState.djurColumn3) {
-                                clicked(3, it)
+                                clicked(uiState, 3, it)
                             }
                             DjurColumn(items = uiState.djurColumn4) {
-                                clicked(4, it)
+                                clicked(uiState, 4, it)
                             }
                         }
                         Spacer(modifier = Modifier.height(48.dp))
@@ -72,9 +74,22 @@ fun MainScreen(
                                 horizontalArrangement = Arrangement.Center
                             ) {
                                 Text(text = "No moves possible. You lose.")
+                                Button(onClick = restartClicked) {
+                                    Text(text = "Restart")
+                                }
+
                             }
                         }
+                        if (uiState.noMoveMade) {
+                        Row {
+                            Button(onClick = shuffleClicked) {
+                                Text(text = "Shuffle")
+                            }
+                        }
+                        }
+
                     }
+
                 }
                 is DjurState.Loading -> {
                     Log.d("ROKN", "Loading")
@@ -91,7 +106,9 @@ fun ScreenPreview() {
     DjurTheme {
         MainScreen(
             state = MutableStateFlow<DjurState>(DjurState.Ongoing).asStateFlow().collectAsState(),
-            clicked = { _, _ -> }
+            clicked = { _, _, _ -> },
+            shuffleClicked = {},
+            restartClicked = {}
         )
     }
 }

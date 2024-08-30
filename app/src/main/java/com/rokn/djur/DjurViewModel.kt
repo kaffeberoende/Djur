@@ -1,5 +1,6 @@
 package com.rokn.djur
 
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.delay
@@ -14,28 +15,46 @@ class DjurViewModel: ViewModel() {
 
     val uiState: StateFlow<DjurState> =  _uiState
 
-    fun clicked(column: Int, id: String) {
-        when(uiState.value) {
-            is DjurState.Ongoing -> {
-                viewModelScope.launch {
-                    _uiState.emit(DjurState.Loading)
-                    delay(100)
-                    when (column) {
-                        1 -> handleRemoval(state.djurColumn1, id)
-                        2 -> handleRemoval(state.djurColumn2, id)
-                        3 -> handleRemoval(state.djurColumn3, id)
-                        4 -> handleRemoval(state.djurColumn4, id)
-                    }
+    init {
+        restart()
+    }
 
-                   if (checkForWin()) {
-                       _uiState.emit(DjurState.Win)
-                   } else {
-                        state.noMovesPossible = checkForLoss()
-                        _uiState.emit(state)
-                    }
-                }
+    fun clicked(state: DjurState.Ongoing, column: Int, id: String) {
+        viewModelScope.launch {
+            _uiState.emit(DjurState.Loading)
+            delay(100)
+            state.noMoveMade = false
+            when (column) {
+                1 -> handleRemoval(state.djurColumn1, id)
+                2 -> handleRemoval(state.djurColumn2, id)
+                3 -> handleRemoval(state.djurColumn3, id)
+                4 -> handleRemoval(state.djurColumn4, id)
             }
-            else -> Unit
+
+            if (checkForWin()) {
+                _uiState.emit(DjurState.Win)
+            } else {
+                state.noMovesPossible = checkForLoss()
+                _uiState.emit(state)
+            }
+        }
+    }
+
+    fun shuffle() {
+        state.shuffle()
+        viewModelScope.launch {
+            _uiState.emit(DjurState.Loading)
+            delay(100)
+            _uiState.emit(state)
+        }
+    }
+
+    fun restart() {
+        state.restart()
+        viewModelScope.launch {
+            _uiState.emit(DjurState.Loading)
+            delay(100)
+            _uiState.emit(state)
         }
     }
 

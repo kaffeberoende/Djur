@@ -14,11 +14,14 @@ class MainActivity : ComponentActivity() {
         setContent {
             DjurTheme {
                 val viewModel = DjurViewModel()
-                MainScreen(state = viewModel.uiState.collectAsState()) { column, id ->
+                MainScreen(state = viewModel.uiState.collectAsState(),
+                        clicked = {state, column, id ->
                     viewModel.viewModelScope.launch {
-                        viewModel.clicked(column, id)
+                        viewModel.clicked(state, column, id)
                     }
-                }
+                },
+                    shuffleClicked = { viewModel.shuffle() },
+                    restartClicked = { viewModel.restart() })
             }
         }
     }
